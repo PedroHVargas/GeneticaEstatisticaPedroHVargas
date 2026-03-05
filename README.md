@@ -1,1 +1,3 @@
-The objective of this repo is to be used for the discipline, and to gather R scripts, packets and tools that could be used or easily adapted for solving common problems in the area of genetitic statistics and plant breeding in general. The main rule for this repo is that all the code must be commented and everything must be as well-documented as possible to ease reuse in future. Feel free to contribute, Thx!! :smile: :v:
+The objective of this repo is to be used for the discipline, and to gather R scripts, packagess and tools that could be used or easily adapted for solving common problems in the area of statistical genetics and plant breeding in general. 
+The main rule for this repo is that all the code must be commented and everything must be as well-documented as possible to ease reuse in future. 
+Feel free to contribute, Thx!! :smile: :v:
