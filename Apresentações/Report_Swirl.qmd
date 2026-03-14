@@ -1,0 +1,90 @@
+---
+title: "Report: Practicing R with Swirl"
+author: 
+  name: Pedro Henrique Vargas de Araujo
+  email: pedrohvargas@usp.br
+  orcid: 0009-0007-4055-9983
+format:
+  html:
+    theme:
+      light: sandstone
+---
+
+## Objetivo
+O objetivo desse trabalho foi ter uma introdução ao aprendizado de R utilizando a plataforma Swirl, um pacote gratuito de aprendizagem interativa que aproveita o console do RStudio, como interface do usuário. Além de apresentar a experiência com o pacote, esse relatório lista conceitos e comandos trabalhados, e curiosidades sobre cada assunto.
+
+## Instalação
+
+Para instalação do swirl foram utilizados os seguintes códigos:
+
+``` r
+install.packages("swirl") #instalação do swirl
+library(swirl) #importação do pacote
+```
+
+Após a instalação foi utilizado o comando swirl(), no prompt para iniciar o pacote. Que apresenta sua função educacional e pede um nome único de usuário para que possa salvar todo o progresso do usuário
+
+```         
+swirl()  
+| Welcome to swirl! Please sign in. If you've been here before, use the same name as you did 
+| then. If you are new, call yourself something unique. 
+What shall I call you? Pedro H
+```
+
+## Swirl
+
+O Swirl é um pacote para R que tem como mote: "aprenda R no R". Cujo qual Apresenta uma série de cursos interativos, focados em data science, nos quais o estudante apredende diretamente pelo prompt de comando do R, sendo eles:
+
+1.  Basic Building Blocks\
+2.  Workspace and Files\
+3.  Sequences of Numbers\
+4.  Vectors\
+5.  Missing Values\
+6.  Subsetting Vectors\
+7.  Matrices and Data Frames\
+8.  Logic\
+9.  Functions\
+10. lapply and sapply\
+11. vapply and tapply\
+12. Looking at Data\
+13. Simulation\
+14. Dates and Times\
+15. Base Graphics
+
+Além dos módulos oficiais, o Swirl, como um projeto de código aberto, conta cursos disponibilizados pela comunidade, que já conta com mais de 7000 forks no Github, o [Swirlify](https://swirlstats.com/swirlify/index.html) é uma plataforma que indexa vários deles, e também armazena tutoriais focados na criação de módulos autorais.
+
+Para começar com algo básico enquanto me ambientava melhor com o ambiente do Console, escolhi começar pelo modulo 1: R Programming Basic Building Blocks.
+
+## R Programming Basic Building Blocks
+
+O modulo R Programming Basic Building Blocks é um módulo focado na primeira interação do aluno com o R como linguagem de programação, além de apresentar as funções de navegação e de usabilidade do Swirl, ele faz uma introdução em como o R pode ser utilizado para realizar cálculos, armazenar valores em váriaveis, usar o comando ? para obter ajuda sobre as funções e também como usar a função c(), que combina valores, permitindo diferentes tipos em um único vetor, que então pode ser usado para realizar operações vetoriais, que automatizam a aplicação das operações para todos os dados armazenados dentro do vetor.
+
+### Curiosidade
+
+Apesar ter noções de R e já ter usado vetores na linguagem, é interessante que o módulo explica como o R processa as informações utilizando vetores, ao invés de só apresentar o conceito de reciclagem em operações vetoriais. Quando por exemplo fazemos uma operação com vetores de tamanhos diferentes o R precisa então assegurar que os vetores utilizados sejam de mesmo tamanho, para isso o que ele faz é gerar vetores por meio da repetição dos valores do vetor informado para assegurar que as operações sejam concluidas, ele realiza a conta, e então exclui da memoria esses vetores temporários, mantendo apenas os originais e o vetor transformado
+
+## R Programming Workspace and Files 
+
+ Após concluir o primeiro módulo, por ter gostado muito do estilo de aprendizagem do pacote, segui experimento parti então para o modulo 2: R programming workspaces and Files Esse módulo ensina sobre como navegar e modificar arquivos pelo R, diretamente pelo código, o que é um conhecimento muito útil para automatização de tarefas complexas e criação de programas mais robustos que envolvam a integração entre multiplos arquivos. As funções trabalhadas foram: 
+
+``` R
+  ls() #lista os objetos carregados na memoria
+  list.files() #lista os arquivos na pasta de trabalho
+  set.wd() #permite a escolha do diretório de trabalho
+  list.files() #lista os arquivos na pasta de trabalho
+  dir.create() #criação de diretório
+  
+  file.create()
+  file.exists()
+  file.remove()
+  file.rename()
+  file.append()
+  file.copy() 
+  #permitem uma série de manipulações básicas de arquivo (criação,remomeação,
+  #remoção, criação de copias etc)
+```
+### Curiosidade
+  Um comando que achei interessante foi o file.path() pois ele permite que sejam feitos scripts funcionais tanto em unix quanto em no sistema de arquivos do Windows, dando como argumento o nome dos diretórios ou arquivos, ele gera o caminho, utilizando "/" , diferentemente do Windows que utiliza "\".
+
+
+ 
