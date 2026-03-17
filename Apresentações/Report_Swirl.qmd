@@ -8,9 +8,11 @@ format:
   html:
     theme:
       light: sandstone
+embed-resources: true
 ---
 
 ## Objetivo
+
 O objetivo desse trabalho foi ter uma introdução ao aprendizado de R utilizando a plataforma Swirl, um pacote gratuito de aprendizagem interativa que aproveita o console do RStudio, como interface do usuário. Além de apresentar a experiência com o pacote, esse relatório lista conceitos e comandos trabalhados, e curiosidades sobre cada assunto.
 
 ## Instalação
@@ -63,11 +65,11 @@ O modulo R Programming Basic Building Blocks é um módulo focado na primeira in
 
 Apesar ter noções de R e já ter usado vetores na linguagem, é interessante que o módulo explica como o R processa as informações utilizando vetores, ao invés de só apresentar o conceito de reciclagem em operações vetoriais. Quando por exemplo fazemos uma operação com vetores de tamanhos diferentes o R precisa então assegurar que os vetores utilizados sejam de mesmo tamanho, para isso o que ele faz é gerar vetores por meio da repetição dos valores do vetor informado para assegurar que as operações sejam concluidas, ele realiza a conta, e então exclui da memoria esses vetores temporários, mantendo apenas os originais e o vetor transformado
 
-## R Programming Workspace and Files 
+## R Programming Workspace and Files
 
- Após concluir o primeiro módulo, por ter gostado muito do estilo de aprendizagem do pacote, segui experimento parti então para o modulo 2: R programming workspaces and Files Esse módulo ensina sobre como navegar e modificar arquivos pelo R, diretamente pelo código, o que é um conhecimento muito útil para automatização de tarefas complexas e criação de programas mais robustos que envolvam a integração entre multiplos arquivos. As funções trabalhadas foram: 
+Após concluir o primeiro módulo, por ter gostado muito do estilo de aprendizagem do pacote, segui experimento parti então para o modulo 2: R programming workspaces and Files Esse módulo ensina sobre como navegar e modificar arquivos pelo R, diretamente pelo código, o que é um conhecimento muito útil para automatização de tarefas complexas e criação de programas mais robustos que envolvam a integração entre multiplos arquivos. As funções trabalhadas foram:
 
-``` R
+``` r
   ls() #lista os objetos carregados na memoria
   list.files() #lista os arquivos na pasta de trabalho
   set.wd() #permite a escolha do diretório de trabalho
@@ -83,8 +85,23 @@ Apesar ter noções de R e já ter usado vetores na linguagem, é interessante q
   #permitem uma série de manipulações básicas de arquivo (criação,remomeação,
   #remoção, criação de copias etc)
 ```
+
 ### Curiosidade
-  Um comando que achei interessante foi o file.path() pois ele permite que sejam feitos scripts funcionais tanto em unix quanto em no sistema de arquivos do Windows, dando como argumento o nome dos diretórios ou arquivos, ele gera o caminho, utilizando "/" , diferentemente do Windows que utiliza "\".
 
+Um comando que achei interessante foi o file.path() pois ele permite que sejam feitos scripts funcionais tanto em unix quanto em no sistema de arquivos do Windows, dando como argumento o nome dos diretórios ou arquivos, ele gera o caminho, utilizando "/" , diferentemente do Windows que utiliza "".
 
- 
+## Sequences of Numbers
+
+Sequence of numbers ensina a criar sequencias númericas no R: sequencias crescentes, decrescentes,com notação usando dois pontos (:), com notação de função (seq() ), alterando inicio, fim e passo, além de ensinar utilizar essa função combinada com matrizes.
+
+### Curiosidade
+
+Nesse módulo conheci uma funcionalidade diferente da função help(), pode ser utilizado o ? com crases em ambos os lados de um simbolo para pesquisar pelo simbolo na documentação, p ex/ ?\`\$´ para entender o uso do cifrão no código R.
+
+## R Programming Vectors
+
+Esse modulo, sob o pretexto de ensinar operar com vetores vai muito além ensinando a operar também com strings em R: juntá-las, concatenar, inserir ou remover espaços entre caracteres, e também destrincha a função paste() e suas funcionalidades.
+
+## Conclusão
+
+Minha experiência com o pacote Swirl foi muito positiva, além de bem organizado, o pacote é intuitivo e criativo. A idéia de aprender direto no IDE é muito fortuita para iniciantes, pois ajuda a quebrar a barreira inicial, colocando o aluno em contato direto com o objeto de estudo, e incentivando a experimentação e o aprendizado ativo. No futuro, espero poder voltar a interagir com o pacote, fazendo o restante dos modulos de R e quem sabe até os outros modulos disponíveis.
