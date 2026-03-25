@@ -1,0 +1,153 @@
+---
+title: "Practical assignments during the class"
+author: 
+  name: Pedro Henrique Vargas de Araujo
+  email: pedrohvargas@usp.br
+  orcid: 0009-0007-4055-9983
+format:
+  html:
+    theme:
+      dark: darkly
+embed-resources: true
+---
+
+## Introdução
+
+A aula 2 do curso de Genética Estatistica do PPG-GMP versa sobre temas básicos de inferencia estatística: Iniciando pela base de estatistica e probabilidade básica: esperança, correlação, covariança, Teorema do Limite Central, tratamento estatistico de variáveis discretas e contínuas, além de ferramentas do R que podem ser utilizadas para fazer a análise descritiva e exploratória dos dados, além de gráficos que podem ser usados. O objetivo dessas práticas foi revisar esses conceitos, por meio da resolução de problemas praticos em R.
+
+## Primeiro Exercício
+### Introdução
+
+O primeiro exercicio consistiu em um problema prático de simular valores de fenótipo, genótipo e ambiente, por amostragem de distribuições de normais, utilizando três tamanhos amostrais: 10,100 e 1000 amostras e fazer as médias e variancias dos 3 componentes, além de planilhas as amostras em forma de histograma, grafico de dispersão mostrando a correlação G x E, box plot, e gráfico de densidade.
+
+### Desenvolvimento
+
+Para começar as simulações, é necessário primeiro configurar um vetor com o tamanho das amostras, e definindo a seed de amostragem:
+
+``` R 
+#setting seed
+set.seed(17765673)
+#sample sizes vector
+samples <- c(10, 100, 1000)
+```
+como todas as simulações e gráficos serão feitos para os três tamanhos amostrais, uma estratégia interessante é usar o loop for para repetir as operações para cada um deles, para isso podemos fazer: 
+
+```R
+for (sample in samples) {
+  G <- rnorm(sample, mean = 0, sd = 1)
+  E <- rnorm(sample, mean = 0, sd = 1)
+  P <- G + E
+  ```
+Com isso o R vai fazer cada uma das amostragens para cada tamanho amostral, seguindo, podemos calculas os indicadores da estatistica descritiva para termos uma noção da distribuição:
+```R
+ # mean and variance
+  medias <- c(mean(P), mean(G), mean(E))
+  variancias <- c(var(P), var(G), var(E))
+  #printing resuls  
+  print(paste("size: ", sample))
+  print(paste("mean :", medias))
+  print(paste("variance :", variancias))
+  ``` 
+  como está dentro do loop, a função printará valores para cada uma dos componentes e tamanhos amostrais:
+  
+```{R}
+#| echo: false
+  
+#setting seed
+set.seed(17765673)
+#sample sizes vector
+samples <- c(10, 100, 1000)
+
+#sampling
+for (sample in samples) {
+  G <- rnorm(sample, mean = 0, sd = 1)
+  E <- rnorm(sample, mean = 0, sd = 1)
+  P <- G + E
+  
+  # mean and variance
+  medias <- c(mean(P), mean(G), mean(E))
+  variancias <- c(var(P), var(G), var(E))
+  #printing resuls  
+  print(paste("size: ", sample))
+  print(paste("mean :", medias))
+  print(paste("variance :", variancias))
+}
+
+```
+  Agora podemos fazer os gráficos pedidos:
+  ``` {R}
+    # Histogram
+  hist(P, main = paste("Histogram of P", sample))
+  
+  # Density
+  plot(density(P), main = paste("Density", sample))
+  
+  # Boxplot
+  boxplot(P, G, E, 
+          names = c("P", "G", "E"),
+          main = paste("Boxplot", sample )
+          )
+  
+  # Scatter plot
+  plot(G, P,
+       main = paste("P x G", sample),
+       xlab = "G", ylab = "P",
+       pch = 19)
+
+  ```
+  Não aparece aqui nessa apresentação, mas também são gerados graficos para 100 e para 10, por estarem dentro do for loop.
+
+### Conclusão
+  
+  Este exercício permitiu revisar, de forma prática, conceitos básicos de estatística aplicados à genética quantitativa, além de evidenciar que amostras maiores produzem estimativas mais estáveis e próximas do esperado.
+
+  Os gráficos auxiliaram na visualização das distribuições e relações entre as variáveis, enquanto o uso do R se mostrou essencial para a análise e interpretação dos dados.
+  
+## Segundo Exercicio
+###Introdução
+  O segundo exercício consistiu em uma análise exploratória de um experimento dentro da base de dados que será utilizada para o Trabalho Final, de maneira aleatória, este autor escolheu trabalhar com o país Benin para esta tarefa, 
+
+### Desevolvimento
+ Iniciaremos o código importando a base de dados africana e criando uma subbase filtrando apenas dados do Benin:
+  
+```{R}
+#importing dataset
+dataset = read.csv("https://raw.githubusercontent.com/mauricioaraujj/Pan_African_Trials_Network/refs/heads/main/data/data.csv",sep = ';')
+dim(dataset)
+#subseting
+data_benin = subset(dataset, env == "E057")
+```
+  
+  Na etapa abaixo, foi feita toda uma análise exploratória dos dados, desde dimensão da base, verificação das variáveis e seus rótulos, até a verificação se as variáveis em estudo tiveram o tipo reconhecido corretamente pelo R e verificação por parcelas perdidas.
+  
+```{R}
+#exploring
+dim(data_benin)
+head(data_benin)
+#viewing if the type of the variables of interest is correct
+str(data_benin[c("GY","NDM" ,"PH_R8")])
+#checking for viewing if there is missing data
+table(data_benin$rep, data_benin$gen)
+```
+
+  Em seguida foi realizada a analise de correlação  utilizando a função cor()
+
+```{R}
+#calculating correlation
+cor(data_benin[c("GY", "NDM", "PH_R8")])
+```
+  
+  Podemos notar que correlação entre variáveis foi desprezivel, mas uma forma melhor de observar é pelo uso do pairwise scatter plot que construiremos a seguir. Como personalizações, escolhi colocar o pch 19, que usa pontos pretos, e coloquei um rótulo para cada variável, de forma auto-explicativa:
+
+``` {R}
+library(ggplot2)
+  pairs(data_benin[c("GY","NDM" ,"PH_R8")], 
+  main = "Pairwise Scatterplot",
+  pch = 19,
+  labels = c("Grain Yield (g)", "Number of days for maturity", "Plant Height in R8 (cm)") 
+  )
+```
+
+### Conclusão 
+
+  A análise exploratória dos dados do Benin foi muito interessante permitiu treinar a verificação da estrutura da base, a consistência das variáveis e a ausência de problemas relevantes nos dados, etapas corriqueiras para quem trabalha com análise de dados, o que será muito relevante aos discentes ao longo de suas tragetórias acadêmicas e profissionais.
