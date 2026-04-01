@@ -1,0 +1,342 @@
+---
+title: "R for Data Science"
+author: "Pedro H. V. de Araujo"
+format: html
+editor: visual
+---
+
+## 1. Introdução
+
+## 2. Questões Variação (10.3)
+
+### 2.1. Preparação do ambiente
+
+Utilizaremos o pacote tidyverse para implementação de utilidades, e o ggplot 2 para construção dos gráficos.
+
+```{R}
+#carregando pacotes Necessários
+library(tidyverse)
+library(ggplot2)
+```
+
+### 2.2. Visualização inicial
+
+```{R}
+#visualizando dados
+view(diamonds)
+summary(diamonds)
+str(diamonds)
+names(diamonds)
+```
+
+### 2.3. Estudo espacial
+
+```{R}
+#plotando as dimensões para visualizar a distribuição 
+  ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = x), binwidth = 0.01)#eixo x
+
+  ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = y), binwidth = 0.01)#eixo y
+
+  ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = z), binwidth = 0.01)#eixo z
+
+```
+
+Por meio dos dados foi possível notar uma distribuição multimodal para as três dimensões. Adicionamente, observa-se que as médias de cada dimensão são diferentes, o que pode servir para dar uma ideia de qual seja o eixo de comprimento, largura e altura. É também, possivel ver detalhes fora da massa, portanto podemos mudar a escala para ampliar
+
+```{R}
+  
+  ggplot(diamonds, aes(x = x)) + 
+  geom_histogram(binwidth = 0.05) +
+  coord_cartesian(xlim = ,ylim = c(0, 50))#reduz a escala para que vejamos ampliado
+  #'' y
+  ggplot(diamonds, aes(x = y)) + 
+  geom_histogram(binwidth = 0.5) +
+  coord_cartesian(xlim = ,ylim = c(0, 50))
+  #'' z
+  ggplot(diamonds, aes(x = z)) + 
+  geom_histogram(binwidth = 0.5) +
+  coord_cartesian(xlim = ,ylim = c(0, 50))
+```
+
+Ficou clara a presença de outliers nas 3 dimensões, uma vez que é impossível a existencia de diamantes com 0cm em qualquer dimensão, é também altamente improvavel a existencia de alguns com valores muitas vezes maiores que a média, portanto, vamos dar uma olhadas nos preços:
+
+```{R}
+library(dplyr)
+
+outlier <- diamonds %>% 
+  filter(
+    x < 3 | x > 9,5 |
+    y < 0,5 | y > 30 |
+    z < 0,1 | z > 20
+  ) %>% 
+  select(price, x, y, z) %>%
+  arrange(y)
+
+outlier
+
+```
+
+É possível ver na tabela muitos diamantes com o preço muito alto e com dimensões 0 e também diamantes de dimensões anormalmente altas e com preços altissimos. Vamos retirá-los do dataset:
+
+```{R}
+
+diamonds_clean <- diamonds %>% 
+  filter(
+    x >= 3 & x <= 9.5,
+    y >= 0.5 & y <= 30,
+    z >= 0.1 & z <= 20
+  )
+```
+
+Agora podemos usar o summary para ter uma noção melhor das dimensões médias:
+
+```{r}
+#| label: summary
+summary(diamonds_clean)
+```
+
+[![Desenho projeções de um diamante](https://media.istockphoto.com/id/1303670311/pt/foto/3d-renderings-of-diamond.jpg?s=612x612&w=0&k=20&c=00QQiB_oljkMGh4rLhofs-5dvqej8RFgxib688yTlps=){fig-alt="(Diamond Drawing)"}](https://media.istockphoto.com/id/1303670311/pt/foto/3d-renderings-of-diamond.jpg?s=612x612&w=0&k=20&c=00QQiB_oljkMGh4rLhofs-5dvqej8RFgxib688yTlps=)
+
+Observando a configuração das faces de um diamante, nota-se que em dois eixos ele tem dimensões parecidas, largura e comprimento, que devem ser portanto X e y ( @summary ) e uma dimensão mais curta, a altura, que deve ser z.
+
+### Resposta 2
+
+  Como vimos nos gráficos e tabelas da tabela anterior, a variavel preço está muito influenciada por outliers com dimensão 0 e preços altissimos, isso fica notável na grande distancia que se nota entre a mediana e a média, que é deslocada para cima por causa dos outliers, podemos planilhar para verificar melhor:
+```{R}
+ggplot(filter(diamonds), aes(x = price)) +
+  geom_histogram(binwidth = 100, center = 0)
+```
+No grafico é notavel uma irregularidade vamos investigar melhor: 
+```{R}
+ggplot(filter(diamonds), aes(x = price)) +
+  geom_histogram(binwidth = 100, center = 0) +
+  coord_cartesian(xlim  = c(0, 2500))
+
+```
+Não existem diamantes na faixa de preço de US$1500, provavelmente um erro no banco de dados.  
+
+### Resposta 3 
+```{R}
+diamonds %>%
+  filter(carat >= 0.99, carat <= 1) %>%
+  count(carat)
+```
+  Existem apenas 23 diamantes com 0,99 quilates, para 1558 com 1 quilate, provavelmente um arredondamento, se houvesse mais diamantes com quilatagem menor até poderia ser um caso de desbaste para padronização, mas como não é o caso, o sistema provavelmente arrendondou para cima as leituras.
+### Resposta 4
+```{R}
+  ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = price)) +
+  coord_cartesian(xlim = c(100, 5000), ylim = c(0, 3000))
+  
+  ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = price)) +
+  xlim(100, 5000) +
+  ylim(0, 3000)
+
+```
+  Os avisos dão uma boa dica do que está acontecendo, enquando o coord_cartesian utiliza o valor padrão de binwidht, no caso 30, ele acaba esticando muito e deixando não visivel, pois existem muitos valores fora de escala. já o xlim e ylim descartam valores menores e maiores que limiares definidos, com isso ele amplia a escala proporcionalmente.
+## 3. Questões Unusual Data
+Para essa questões teremos de utilizar variáveis diferentes para permitir a correta utilização de cada grafico, enquanto o histograma trabalha bem com valores continuos, os agrupando em bins, o gráfico de barras trabalha muito melhor com variáveis categóricas ou discretas, pois plota uma barra para cada valor. Portanto, utilizaremos as variaveis x e cut.
+```{R}
+#histograma
+diamonds2 <- diamonds %>%
+  mutate(y = ifelse(y < 3 | y > 20, NA, y))
+ggplot(diamonds2, aes(x = y)) +
+  geom_histogram()
+#bar chart
+diamonds %>%
+  mutate(cut = if_else(runif(n()) < 0.1, NA_character_, as.character(cut))) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = cut))
+```
+
+No histograma os valores devem ser numéricos, os valores de NA indefinidos, portanto são desconsiderados, como o Aviso já evidencia. Diferentemente, o bar chart utiliza categorias, e plota a frequencia de cada um como barra, cria uma categoria para agrupar os NAs
+
+### Resposta 2
+> What does na.rm = TRUE do in mean() and sum()?
+
+O na.rm= TRUE desconsidera os NA do dataset, a importancia dessa função é permitir que as funções sejam calculadas, uma vez que NA tem valor indefinido, qualquer calculo com NA retorna NA como resposta, retirando-os recebemos o resultado esperado:
+
+```{R}
+#sem na.rm
+mean(c(0,10, NA))
+#com na.rm
+mean(c(0,10,NA), na.rm = TRUE)
+```
+
+### Resposta 3
+> Recreate the frequency plot of scheduled_dep_time colored by whether the flight was cancelled or not. Also facet by the cancelled variable. Experiment with different values of the scales variable in the faceting function to mitigate the effect of more non-cancelled flights than cancelled flights.
+
+```{R} 
+#| warning: false
+#| error: false 
+#scales = fixed
+install.packages("nycflights13")
+library(nycflights13)     
+
+nycflights13::flights |> 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + (sched_min / 60)
+  ) |> 
+  ggplot(aes(x = sched_dep_time)) + 
+  geom_freqpoly(aes(color = cancelled), binwidth = 1/4)
+#scales fixed
+nycflights13 :: flights |>
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + (sched_min / 60)
+  ) |>
+  ggplot(aes(x = sched_dep_time)) +
+  geom_freqpoly(aes(color = cancelled), binwidth = 1/4) +
+  facet_wrap(~ cancelled, scales = "fixed")
+#scales: free_y
+nycflights13 :: flights |>
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + (sched_min / 60)
+  ) |>
+  ggplot(aes(x = sched_dep_time)) +
+  geom_freqpoly(aes(color = cancelled), binwidth = 1/4) +
+  facet_wrap(~ cancelled, scales = "free_y")
+#scales free
+nycflights13 :: flights |>
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + (sched_min / 60)
+  ) |>
+  ggplot(aes(x = sched_dep_time)) +
+  geom_freqpoly(aes(color = cancelled), binwidth = 1/4) +
+  facet_wrap(~ cancelled, scales = "free")
+
+```
+  Como é possivel ver nos graficos, o scales = fixed, utilizou um parametro fixo para ambos os graficos, como no grafico compinado, igualando a escala, e achatando os valores de voos cancelados. Ja o free_y permite ajuste automatico do parametro y, ajustando a escala para melhor visualização, porém a desvaltagem é que perdemos a comparação direta. Por fim o free, permite o ajuste automatico tanto em y quanto em x, como o eixo x já estava bem ajustado neste exemplo, ele permaneceu igual.
+## Covariancia
+
+> Use what you’ve learned to improve the visualization of the departure times of cancelled vs. non-cancelled flights.
+
+Usando os conhecimentos que aprendemos podemos fazer um boxplot que permita a comparação:
+
+```{R}
+
+nycflights13::flights %>%
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(y = sched_dep_time, x = cancelled))
+```
+### Resposta 2
+
+> Based on EDA, what variable in the diamonds dataset appears to be most important for predicting the price of a diamond? How is that variable correlated with cut? Why does the combination of those two relationships lead to lower quality diamonds being more expensive?
+
+Para visualizar as correlações podemos criar uma matriz de correlação utilizando o GGally:
+```{R}
+#Selecionando variáveis númericas
+diamonds_subset <- diamonds[sapply(diamonds, is.numeric)]
+
+#Calculando correlação
+print(cor(diamonds_subset))
+
+```
+É possível notar uma correlação alta entre a variável preço e a variável carat, que também tem relação com as dimensões do diamante pois deriva delas. Antes de tirar conclusões, também devemos fazer um estudo das variáveis categóricas, para isso podemos utilizar boxplot:
+```{R}
+diamonds %>%
+  mutate(color = fct_rev(color)) %>%
+  ggplot(aes(x = color, y = price)) +
+  geom_boxplot()
+
+ggplot(data = diamonds) +
+  geom_boxplot(mapping = aes(x = clarity, y = price))
+
+ggplot(diamonds, aes(x = cut, y = price)) +
+  geom_boxplot()
+
+ggplot(diamonds, aes(x = cut, y = carat)) +
+  geom_boxplot()
+```
+  Após analisar os gráficos, nota-se que podem existir correlações, mas nenhuma tão significativa quanto a quilatagem. Quanto a variável cut, não é possível notar pelo grafico uma correlação linear com o preço, já quando fazemos o grafico de carat x cut, nota-se uma correlação negativa, o que significa que os diamantes maiores, e provavelmente, mais caros, muitas vezes não apresentam os melhores tipos de cortes.
+  
+### Resposta 3
+
+> Instead of exchanging the x and y variables, add coord_flip() as a new layer to the vertical boxplot to create a horizontal one. How does this compare to exchanging the variables?
+
+Para resolver essa questão podemos utilizar o código da teoria, que utiliza o dataset mg.
+```{R}
+#variáveis trocadas
+ggplot(mpg, aes(x = hwy, y = fct_reorder(class, hwy, median))) +
+  geom_boxplot()
+#coord_flip()
+ggplot(mpg, aes(x = fct_reorder(class, hwy, median), y = hwy)) +
+  geom_boxplot() +
+  coord_flip()
+```
+  Aparentemente o resultado foi o mesmo.
+  
+###Resposta 4
+> One problem with boxplots is that they were developed in an era of much smaller datasets and tend to display a prohibitively large number of “outlying values”. One approach to remedy this problem is the letter value plot. Install the lvplot package, and try using geom_lv() to display the distribution of price vs. cut. What do you learn? How do you interpret the plots?
+
+```{R}
+#Instalando pacote
+
+library(lvplot)
+#Testando plot
+ggplot(diamonds, aes(x = cut, y = price)) +
+  geom_lv()
+
+```
+Esse tipo de mapa dá uma noção melhor da frequência de qualidade em cada nível de preço.
+### Resposta 5
+
+> Create a visualization of diamond prices vs. a categorical variable from the diamonds dataset using geom_violin(), then a faceted geom_histogram(), then a colored geom_freqpoly(), and then a colored geom_density(). Compare and contrast the four plots. What are the pros and cons of each method of visualizing the distribution of a numerical variable based on the levels of a categorical variable?
+
+```{R}
+#violin
+ggplot(diamonds, aes(price, cut)) +
+  geom_violin()
+#histogram
+ggplot(diamonds, aes(x = price)) +
+  geom_histogram() +
+  facet_wrap(~cut, ncol = 1, scales = "free_y")
+#freqpoly()
+ggplot(diamonds, aes(x = price)) +
+  geom_freqpoly(aes(color = cut))
+#geom_density
+ggplot(diamonds, aes(x = price, color = cut, fill = cut)) +
+  geom_density()
+
+```
+Observando todos os graficos, é possivel separá-los em dois grupos, os graficos que apenas dão uma noção mais geral do formato e da simetria da distribuição como o violin e o density, dos que permitem realizar comparações mais diretas, como o histrograma e o freqpoly.
+
+### Resposta 6
+> If you have a small dataset, it’s sometimes useful to use geom_jitter() to avoid overplotting to more easily see the relationship between a continuous and categorical variable. The ggbeeswarm package provides a number of methods similar to geom_jitter(). List them and briefly describe what each one does.
+O pacote ggbeeswarm oferece várias alternativas ao geom_jitter() para evitar sobreposição de pontos e melhorar a visualização da relação entre variáveis contínuas e categóricas. As principais funções são:
+
+geom_beeswarm()
+  Organiza os pontos de forma semelhante a um “enxame de abelhas”, distribuindo-os para evitar sobreposição. Mantém os pontos próximos da posição original, mas os desloca horizontalmente (ou verticalmente) de maneira controlada.
+
+geom_quasirandom()
+  Espalha os pontos usando um padrão شبه-aleatório (quase aleatório), garantindo uma distribuição mais uniforme do que o jitter puro, mas ainda preservando a estrutura dos dados.
+
+* Métodos:
+
+  + swarm: posiciona os pontos um a um, evitando colisões (layout clássico de beeswarm).
+  + compactswarm: semelhante ao swarm, mas mais compacto, ocupando menos espaço.
+  + center: centraliza os pontos ao longo do eixo categórico.
+  + hex: organiza os pontos em uma grade hexagonal.
+  + square: organiza os pontos em uma grade quadrada
+  

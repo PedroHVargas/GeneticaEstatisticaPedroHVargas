@@ -1,0 +1,147 @@
+---
+title: "Analise Segregação"
+author: 
+  - name: Pedro Henrique Vargas de Araujo
+    email: pedrohvargas@usp.br
+format: 
+  html:
+    embed-resources: true
+    code-fold: true
+    toc: true
+    theme: 
+      light: journal
+      dark: darkly
+
+---
+
+## 1. Introdução
+
+Este relatório tem como objetivo avaliar a segregação de marcadores no dataset. A análise consiste em testar se os genótipos observados seguem a proporção esperada sob herança mendeliana. Na base, os homozigotos dominantes foram identificados como 0, os homozigotos recessivos como 2 e os heterozigotos como 1
+
+O foco da análise está nos homozigotos (0 e 2), para ver se sguem a proporção de 1:1. (advinda da proporção 1:2:1 de Mendel)
+
+## Desenvolvimento
+### Hipótese Estatística
+
+-   **H0 (hipótese nula):** proporção de 0 e 2 é igual (1:1)
+-   **H1 (hipótese alternativa):** proporção diferente de 1:1
+
+### Importação dos Dados
+``` {R} 
+library(tidyverse)
+
+dados <- read.csv("C:/Users/ph408/Downloads/Z009.csv", header=FALSE, row.names=1)
+
+### 4. Seleção das colunas
+
+marcadores <- names(dados)[2:1138]
+
+#verificação se os marcadores estão ok
+length(marcadores)
+head(marcadores)
+```
+### Analise dos marcadores 
+
+```{R}
+analisa_chi <- function(vetor, nome_marcador){
+
+  vetor <- suppressWarnings(as.numeric(as.character(vetor)))
+  vetor <- vetor[!is.na(vetor)]
+
+  n0 <- sum(vetor == 0)
+  n2 <- sum(vetor == 2)
+
+  n_hom <- n0 + n2
+
+  if(n_hom == 0){
+    return(tibble(
+      marcador = nome_marcador,
+      n0 = NA,
+      n2 = NA,
+      esperado = NA,
+      qui_quadrado = NA,
+      p_valor = NA,
+      significativo = NA,
+      interpretacao = NA
+    ))
+  }
+
+  # valores esperados (1:1)
+  esperado <- n_hom / 2
+
+  # teste qui-quadrado
+  teste <- chisq.test(c(n0, n2), p = c(0.5, 0.5), correct = FALSE)
+
+  p_valor <- teste$p.value
+  chi <- as.numeric(teste$statistic)
+
+  significativo <- p_valor < 0.05
+
+  interpretacao <- ifelse(significativo,
+                         "Distorção de segregação",
+                         "Segregação esperada")
+
+  tibble(
+    marcador = nome_marcador,
+    n0 = n0,
+    n2 = n2,
+    esperado = esperado,
+    qui_quadrado = round(chi, 3),
+    p_valor = round(p_valor, 5),
+    significativo = significativo,
+    interpretacao = interpretacao
+  )
+}
+
+# Aplicar a todos os marcadores
+resultados_chi <- map_dfr(marcadores, ~ analisa_chi(dados[[.x]], .x))
+
+# Visualizar
+head(resultados_chi)
+
+```
+Dos 1106 marcadores avaliados, 171 apresentaram evidência de distorção de
+segregação ao nível de 5%. Portanto, o conjunto como um todo mostra um predomínio de marcadores compatíveis com a segregação 1:1
+
+### Sampling
+Agora, selecionaremos 5 marcadores aleatórios, usando como seed meu id usp
+```{R}
+set.seed(17765673)
+marcadores_sel <- sample(marcadores, 5)
+marcadores_sel
+
+```
+### Visualização
+```{R}
+library(ggplot2)
+
+plots <- lapply(marcadores_sel, function(m) {
+
+  vetor <- dados[[m]]
+  vetor <- vetor[!is.na(vetor)]
+
+  n0 <- sum(vetor == 0)
+  n2 <- sum(vetor == 2)
+  n_hom <- n0 + n2
+
+  df <- tibble(
+    genotipo = c("AA", "aa"),
+    freq = c(n0, n2)
+  )
+
+  p_valor <- if (n_hom > 0) binom.test(n0, n_hom, p = 0.5)$p.value else NA
+
+  ggplot(df, aes(x = genotipo, y = freq)) +
+    geom_col() +
+    geom_hline(yintercept = n_hom/2, linetype = "dashed") +
+    labs(
+      title = paste("Marcador:", m),
+      subtitle = paste("p-valor =", round(p_valor, 4))
+    )
+})
+library(patchwork)
+wrap_plots(plots, ncol = 2)
+```
+
+### Conclusão
+a base de dados apresentou segregação próxima à esperada, como pode ser visto nos graficos e nos p valores significativos, 15,5% dos marcadores não apresentaram segregação 1:1
