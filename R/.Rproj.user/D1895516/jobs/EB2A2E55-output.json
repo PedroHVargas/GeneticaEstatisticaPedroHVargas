@@ -1,0 +1,4 @@
+[1,"==> quarto preview Report_Swirl.qmd --to html --no-watch-inputs --no-browse\n\n"]
+[1,"pandoc \n  to: html\n  output-file: Report_Swirl.html\n  standalone: true\n  section-divs: true\n  html-math-method: mathjax\n  wrap: none\n  default-image-extension: png\n  variables: {}\n  \nmetadata\n  document-css: false\n  link-citations: true\n  date-format: long\n  lang: en\n  title: 'Report: Practicing R with Swirl'\n  author:\n    name: Pedro Henrique Vargas de Araujo\n    email: pedrohvargas@usp.br\n    orcid: 0009-0007-4055-9983\n  theme:\n    light: sandstone\n  \n"]
+[1,"Output created: Report_Swirl.html\n\nWatching files for changes\n"]
+[1,"Browse at http://localhost:4884/\nListening on http://127.0.0.1:4884/\n"]

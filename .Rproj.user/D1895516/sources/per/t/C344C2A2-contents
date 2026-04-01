@@ -1,0 +1,26 @@
+---
+title: "Practicing R with Swirl"
+author: "PedroHVargas"
+format: html
+editor: visual
+---
+
+## Objetivo
+
+## Instalação
+
+Para instalação do swirl foram utilizados os seguintes códigos:
+
+``` r
+install.packages("swirl") #instalação do swirl
+library(swirl) #importação do pacote
+```
+
+Após a instalação foi utilizado o comando swirl(), no prompt para iniciar o pacote. Que apresenta sua função educacional e pede um nome único de usuário para que possa salvar todo o progresso do usuário
+
+```         
+> swirl()
+| Welcome to swirl! Please sign in. If you've been here before, use the same name as you did 
+| then. If you are new, call yourself something unique.  What shall I call you? 
+Pedro H
+```
